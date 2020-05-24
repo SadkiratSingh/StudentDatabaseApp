@@ -3,6 +3,7 @@ from tkinter import ttk
 import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
+import tkinter.messagebox as msg
 
 class StudentDB:
     headers=['ID','First Name','Last Name','Email','Street','City','State',
@@ -233,6 +234,109 @@ class StudentDB:
         for data in self.student_info:
             self.tree.insert('','end',values=data)
 
+    def apply_checks_on_entries(f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
+        check_list=[]
+        #patterns#
+        name_pat='^[A-Z][a-z]+$'
+        city_pat='^[A-Z][A-Za-z\s]+$'
+        state_pat='^[A-Z]{2}$'
+        street_pat='^[A-Z0-9]{1,5}[\w\s]+$'
+        zip_pat='^[0-9]{5}$'
+        phone_pat='^[0-9]{3}-[0-9]{3}-[0-9]{4}$'
+        dob_pat='^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+        email_pat='^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
+        lunch_pat='^[0-9]{1,3}\.[0-9]{1,3}$'
+        #patterns#
+
+        #f_name
+        f_srch=re.search(name_pat,f_name)
+        if(f_srch is None):
+            check_list.append(0)
+        else:
+            check_list.append(1)
+        #f_name
+
+        #l_name
+        l_srch=re.search(name_pat,l_name)
+        if(l_srch is None):
+            check_list.append(0)
+        else:
+            check_list.append(1)
+        #l_name
+
+        #city#
+        city_srch=re.search(street_pat,city)
+        if(city_srch is None):
+            check_list.append(0)
+        else:
+            check_list.append(1)
+        #city
+
+        #state#
+        if(len(self.state_var.get())==2):
+            state_srch=re.search(state_pat,state)
+            if state_srch is None:
+                check_list.append(0)
+            else:
+                check_list.append(1)
+        else:
+            check_list.append(0)
+        #state#
+        
+        #street#
+        street_search=re.search(street_pat,street)
+        if(street_search is None):
+             check_list.append(0)
+        else:
+            check_list.append(1)
+        #street#
+
+        #zip#
+        zip_search=re.search(zip_pat,zip)
+        if(zip_search is None):
+            check_list.append(0)
+        else:
+            check_list.append(1)
+        #zip#
+
+        #phone#
+        ph_search=re.search(phone_pat,phone)
+        if(ph_search is None or ph_search.span()[0]!=0):
+            check_list.append(0)
+        else:
+            check_list.append(1)
+        #phone#
+
+        #dob#
+        dob_search=re.search(phone_pat,dob)
+        if(dob_search is None):
+            check_list.append(0)
+        else:
+            birth_yr=int(dob[0:4])
+            birth_mt=int(dob[5:7])
+            birth_dy=int(dob[8:10])
+            if((1970<=birth_yr<=2020) and (1<=birth_mt<=12) and (1<=birth_dy<=31)):
+                check_list.append(1)
+            else:
+                check_list.append(0)
+        #dob#
+
+        #email#
+        email_search=re.search(email_pat,email)
+        if(email_search is None):
+            check_list.append(0)
+        else:
+            check_list.append(1)
+        #email#
+        
+        #lunch#
+        lunch_search=re.search(lunch_pat,lunch)
+        if(lunch_search is None):
+            check_list.append(0)
+        else:
+            check_list.append(1)
+        #lunch#
+
     def all_entries_filled(self,id_need):
         if (len(self.f_name_var.get())==0 or
         len(self.l_name_var.get())==0 or
@@ -271,6 +375,8 @@ class StudentDB:
             dob=self.dob_var.get()   
             sex=self.sex_var.get()   #try to apply a combobox here
             lunch=self.lunch_var.get()
+            self.apply_checks_on_entries(f_name,l_name,email,street,city,state,zip,phone,dob,lunch)
+
             self.query=f'''INSERT INTO students(first_name,last_name,email,street,city,state,zip,phone,birth_date,sex,date_entered,lunch_cost) 
                       VALUES('{f_name}','{l_name}','{email}','{street}','{city}','{state}',{zip},'{phone}',
                       '{dob}','{sex}','{entry_date_format}',{lunch})
