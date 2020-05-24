@@ -2,12 +2,12 @@ from tkinter import *
 from tkinter import ttk
 import mysql.connector
 from mysql.connector import Error
+from datetime import datetime
 
 class StudentDB:
     headers=['ID','First Name','Last Name','Email','Street','City','State',
              'Zip','Phone','DOB','Sex','Lunch']
-    student_info=[(1,'Harry', 'Truman', 'htruman@aol.com', '202 South St', 'Vancouver', 'WA', 98660,          '792-223-9810', '1946-1-24','M',3.50),(2,'Shelly', 'Johnson', 'sjohnson@aol.com', '9 Pond Rd', 'Sparks', 'NV', 89431, '792-223-6734', '1970-12-12','F', 3.50),(3,'Bobby', 'Briggs', 'bbriggs@aol.com', '14 12th St', 'San Diego', 'CA',92101, '792-223-6178', '1967-5-24','M', 3.50),(4,'Donna', 'Hayward', 'dhayward@aol.com', '120 16th St', 'Davenport', 'IA', 52801, '792-223-2001', '1970-3-24','F',3.50),(5,'Audrey', 'Horne', 'ahorne@aol.com', '342 19th St', 'Detroit', 'MI', 48222, '792-223-2001', '1965-2-1','F', 3.50),(6,'James', 'Hurley', 'jhurley@aol.com', '2578 Cliff St', 'Queens', 'NY', 11427, '792-223-1890', '1967-1-2','M',3.50)]
-
+    student_info=[]
     conn=None
     cursor=None
     query=None
@@ -15,7 +15,7 @@ class StudentDB:
     def __init__(self):
         self.tree=None
         self.username=StringVar(root,value='')
-        self.password=StringVar(root,value='')
+        self.pass_word=StringVar(root,value='')
         self.create_login_db()
 
     def create_login_db(self):
@@ -36,7 +36,7 @@ class StudentDB:
         #password#
         pass_label=Label(self.frame,text='Password:')
         pass_label.grid(row=1,column=0,sticky='E',padx=5,pady=10)
-        pass_entry=Entry(self.frame,textvariable=self.password,show='*')
+        pass_entry=Entry(self.frame,textvariable=self.pass_word,show='*')
         pass_entry.grid(row=1,column=1,sticky='W',padx=5,pady=10)
         #password#
 
@@ -55,8 +55,8 @@ class StudentDB:
         #verify#
         if(len(self.username.get())==0 or
            self.username.get()!='studentadmin' or
-           len(self.password.get())==0 or
-           self.password.get()!='khalsapanth1*'):
+           len(self.pass_word.get())==0 or
+           self.pass_word.get()!='khalsapanth1*'):
            self.error_var.set('Enter correct credentials!')
         #verify
 
@@ -65,6 +65,14 @@ class StudentDB:
             self.delete_login_widgets()
             root.geometry("1500x600")
             root.title("Manage Student Records")
+            ##connect to db##
+            try:
+                self.conn=mysql.connector.connect(host='localhost',database='students',
+                                                  username=self.username.get(),
+                                                  password=self.pass_word.get())
+            except Error as e:
+                print(e)
+            ##connect to db##
             self.create_widgets()
 
     def delete_login_widgets(self):
@@ -194,19 +202,117 @@ class StudentDB:
             self.tree.column(col_id,width=113,anchor=CENTER)
             self.tree.heading(col_id,text=col,anchor=CENTER)
             i+=1
-        for data in self.student_info:
-            self.tree.insert('','end',values=data)
-
+        self.update_tree()
         self.tree.grid(row=3,column=0,columnspan=20)
         #treeview#
 
+    
+    def execute_query(self,query,result_expected):
+        try:
+            self.cursor=self.conn.cursor()
+            self.cursor.execute(query)
+            if result_expected:
+                self.student_info=self.cursor.fetchall()
+            self.conn.commit()
+            self.cursor.close()
+
+        except Error as e:
+            print("Error: ",e)
+            
+
+    def update_tree(self):
+        self.query='''SELECT student_id,first_name,last_name,email,street,city,state,zip,phone,
+                      birth_date,sex,lunch_cost
+                      FROM students'''
+        if (self.conn.is_connected()):
+            all_students=self.tree.get_children()
+            if(len(all_students)!=0):
+                self.tree.delete(*all_students)
+            self.execute_query(self.query,True)
+        
+        for data in self.student_info:
+            self.tree.insert('','end',values=data)
+
+    def all_entries_filled(self,id_need):
+        if (len(self.f_name_var.get())==0 or
+        len(self.l_name_var.get())==0 or
+        len(self.email_var.get())==0 or
+        len(self.street_var.get())==0 or
+        len(self.city_var.get())==0 or
+        len(self.state_var.get())==0 or
+        len(self.zip_var.get())==0 or
+        len(self.phone_var.get())==0 or
+        len(self.dob_var.get())==0 or
+        len(self.sex_var.get())==0 or
+        len(self.lunch_var.get())==0):
+            return False
+        elif id_need:
+            if(len(self.sid_var.get())==0):
+                return False
+            else:
+                return True
+        return True
+           
+
     def add_student(self):
-        pass
+        entry_date=datetime.now()
+        entry_date_format=entry_date.strftime('%Y-%m-%d')
+
+        if self.all_entries_filled(False):
+            #apply various regex checks here#
+            f_name=self.f_name_var.get()
+            l_name=self.l_name_var.get()
+            email=self.email_var.get() 
+            street=self.street_var.get()
+            city=self.city_var.get()
+            state=self.state_var.get()
+            zip=self.zip_var.get()
+            phone=self.phone_var.get()
+            dob=self.dob_var.get()   
+            sex=self.sex_var.get()   #try to apply a combobox here
+            lunch=self.lunch_var.get()
+            self.query=f'''INSERT INTO students(first_name,last_name,email,street,city,state,zip,phone,birth_date,sex,date_entered,lunch_cost) 
+                      VALUES('{f_name}','{l_name}','{email}','{street}','{city}','{state}',{zip},'{phone}',
+                      '{dob}','{sex}','{entry_date_format}',{lunch})
+                      '''
+            if(self.conn.is_connected()):
+                self.execute_query(self.query,False)
+                self.update_tree()
 
     def update_student(self):
-        pass
+        if self.all_entries_filled(True):
+            f_name=self.f_name_var.get()
+            l_name=self.l_name_var.get()
+            email=self.email_var.get() 
+            street=self.street_var.get()
+            city=self.city_var.get()
+            state=self.state_var.get()
+            zip=self.zip_var.get()
+            phone=self.phone_var.get()
+            dob=self.dob_var.get()   
+            sex=self.sex_var.get()
+            lunch=self.lunch_var.get()
+            stu_id=self.sid_var.get()           
+ 
+            self.query=f'''UPDATE students SET first_name='{f_name}',last_name='{l_name}',email='{email}',
+                          street='{street}',city='{city}',state='{state}',zip={zip},phone='{phone}',
+                          birth_date='{dob}',sex='{sex}',lunch_cost={lunch} WHERE student_id={stu_id}'''
+
+            if(self.conn.is_connected()):
+                self.execute_query(self.query,False)
+                self.update_tree()
 
     def delete_student(self):
+        if len(self.sid_var.get())==0:
+            self.pop_message()
+        else:
+            stu_id=self.sid_var.get()
+            self.query=f'''DELETE FROM students WHERE student_id={stu_id}'''
+            if(self.conn.is_connected()):
+                self.execute_query(self.query,False)
+                self.update_tree()
+    
+    def pop_message(self):
         pass
 
         
@@ -214,7 +320,5 @@ class StudentDB:
 
 
 root=Tk()
-#root.geometry('1500x600')
-#root.title("StudentRecords")
 stu_db=StudentDB()
 root.mainloop()
