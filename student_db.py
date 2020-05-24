@@ -4,6 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 import tkinter.messagebox as msg
+import re
 
 class StudentDB:
     headers=['ID','First Name','Last Name','Email','Street','City','State',
@@ -234,7 +235,7 @@ class StudentDB:
         for data in self.student_info:
             self.tree.insert('','end',values=data)
 
-    def apply_checks_on_entries(f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
+    def apply_checks_on_entries(self,id_check,f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
         check_list=[]
         #patterns#
         name_pat='^[A-Z][a-z]+$'
@@ -246,7 +247,17 @@ class StudentDB:
         dob_pat='^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
         email_pat='^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
         lunch_pat='^[0-9]{1,3}\.[0-9]{1,3}$'
+        id_pat='^[1-9]+$'
         #patterns#
+
+        #id
+        if id_check:
+            id_srch=re.search(id_pat,self.sid_var.get())
+            if(id_srch is None):
+                check_list.append(0)
+            else:
+                check_list.append(1)
+        #id
 
         #f_name
         f_srch=re.search(name_pat,f_name)
@@ -265,7 +276,7 @@ class StudentDB:
         #l_name
 
         #city#
-        city_srch=re.search(street_pat,city)
+        city_srch=re.search(city_pat,city)
         if(city_srch is None):
             check_list.append(0)
         else:
@@ -308,7 +319,7 @@ class StudentDB:
         #phone#
 
         #dob#
-        dob_search=re.search(phone_pat,dob)
+        dob_search=re.search(dob_pat,dob)
         if(dob_search is None):
             check_list.append(0)
         else:
@@ -336,6 +347,9 @@ class StudentDB:
         else:
             check_list.append(1)
         #lunch#
+        
+        return all(check_list)
+
 
     def all_entries_filled(self,id_need):
         if (len(self.f_name_var.get())==0 or
@@ -363,7 +377,6 @@ class StudentDB:
         entry_date_format=entry_date.strftime('%Y-%m-%d')
 
         if self.all_entries_filled(False):
-            #apply various regex checks here#
             f_name=self.f_name_var.get()
             l_name=self.l_name_var.get()
             email=self.email_var.get() 
@@ -375,15 +388,18 @@ class StudentDB:
             dob=self.dob_var.get()   
             sex=self.sex_var.get()   #try to apply a combobox here
             lunch=self.lunch_var.get()
-            self.apply_checks_on_entries(f_name,l_name,email,street,city,state,zip,phone,dob,lunch)
 
-            self.query=f'''INSERT INTO students(first_name,last_name,email,street,city,state,zip,phone,birth_date,sex,date_entered,lunch_cost) 
-                      VALUES('{f_name}','{l_name}','{email}','{street}','{city}','{state}',{zip},'{phone}',
-                      '{dob}','{sex}','{entry_date_format}',{lunch})
-                      '''
-            if(self.conn.is_connected()):
-                self.execute_query(self.query,False)
-                self.update_tree()
+            if self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
+
+                self.query=f'''INSERT INTO students(first_name,last_name,email,street,city,state,zip,phone,birth_date,sex,date_entered,lunch_cost) 
+                        VALUES('{f_name}','{l_name}','{email}','{street}','{city}','{state}',{zip},'{phone}',
+                        '{dob}','{sex}','{entry_date_format}',{lunch})
+                        '''
+                if(self.conn.is_connected()):
+                    self.execute_query(self.query,False)
+                    self.update_tree()
+            else:
+                msg.showwarning(title='Enter Valid Data', message='Please enter valid information! Click on the button on right of entries for more info on format of entries ')
 
     def update_student(self):
         if self.all_entries_filled(True):
@@ -399,14 +415,17 @@ class StudentDB:
             sex=self.sex_var.get()
             lunch=self.lunch_var.get()
             stu_id=self.sid_var.get()           
- 
-            self.query=f'''UPDATE students SET first_name='{f_name}',last_name='{l_name}',email='{email}',
-                          street='{street}',city='{city}',state='{state}',zip={zip},phone='{phone}',
-                          birth_date='{dob}',sex='{sex}',lunch_cost={lunch} WHERE student_id={stu_id}'''
+            if self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
+                self.query=f'''UPDATE students SET first_name='{f_name}',last_name='{l_name}',email='{email}',
+                            street='{street}',city='{city}',state='{state}',zip={zip},phone='{phone}',
+                            birth_date='{dob}',sex='{sex}',lunch_cost={lunch} WHERE student_id={stu_id}'''
 
-            if(self.conn.is_connected()):
-                self.execute_query(self.query,False)
-                self.update_tree()
+                if(self.conn.is_connected()):
+                    self.execute_query(self.query,False)
+                    self.update_tree()
+            else:
+                msg.showwarning(title='Enter Valid Data', message='Please enter valid information! Click on the button on right of entries for more info on format of entries ')
+            
 
     def delete_student(self):
         if len(self.sid_var.get())==0:
