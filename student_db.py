@@ -13,6 +13,7 @@ class StudentDB:
     conn=None
     cursor=None
     query=None
+    error_widget_list=None
 
     def __init__(self):
         self.tree=None
@@ -87,111 +88,148 @@ class StudentDB:
 
         #student_id#
         sid_label=Label(root,text='ID:')
-        sid_label.grid(row=0,column=0,padx=5,pady=10,sticky=W)
+        sid_label.grid(row=0,column=0,pady=10,sticky=W)
         self.sid_var=StringVar(root,value='')
-        sid_entry=Entry(root,textvariable=self.sid_var)
-        sid_entry.grid(row=0,column=1,padx=5,pady=10,sticky=W)
+        self.sid_entry=Entry(root,textvariable=self.sid_var)
+        self.sid_entry.grid(row=0,column=1,pady=10,sticky=W)
+        self.sid_err_var=StringVar(root,value='')
+        self.sid_error_label=ttk.Label(root,textvariable=self.sid_err_var,foreground='red')
+        self.sid_error_label.grid(row=0,column=2,sticky=W)
         #student_id#
 
         #firstname#
         f_name_label=Label(root,text='First Name:')
-        f_name_label.grid(row=0,column=2,padx=5,pady=10,sticky=W)
+        f_name_label.grid(row=0,column=3,pady=10,sticky=W)
         self.f_name_var=StringVar(root,value='')
-        f_name_entry=Entry(root,textvariable=self.f_name_var)
-        f_name_entry.grid(row=0,column=3,padx=5,pady=10,sticky=W)
+        self.f_name_entry=Entry(root,textvariable=self.f_name_var)
+        self.f_name_entry.grid(row=0,column=4,pady=10,sticky=W)
+        self.fname_err_var=StringVar(root,value='')
+        self.fname_error_label=ttk.Label(root,textvariable=self.fname_err_var,foreground='red')
+        self.fname_error_label.grid(row=0,column=5,sticky=W)
         #firstname#
 
         #lastname#
         l_name_label=Label(root,text='Last Name:')
-        l_name_label.grid(row=0,column=4,padx=5,pady=10,sticky=W)
+        l_name_label.grid(row=0,column=6,pady=10,sticky=W)
         self.l_name_var=StringVar(root,value='')
-        l_name_entry=Entry(root,textvariable=self.l_name_var)
-        l_name_entry.grid(row=0,column=5,padx=5,pady=10,sticky=W)
+        self.l_name_entry=Entry(root,textvariable=self.l_name_var)
+        self.l_name_entry.grid(row=0,column=7,pady=10,sticky=W)
+        self.lname_err_var=StringVar(root,value='')
+        self.lname_error_label=ttk.Label(root,textvariable=self.lname_err_var,foreground='red')
+        self.lname_error_label.grid(row=0,column=8,sticky=W)
         #lastname#
 
         #email#
         email_label=Label(root,text='Email:')
-        email_label.grid(row=0,column=6,padx=5,pady=10,sticky=W)
+        email_label.grid(row=0,column=9,pady=10,sticky=W)
         self.email_var=StringVar(root,value='')
-        email_entry=Entry(root,textvariable=self.email_var)
-        email_entry.grid(row=0,column=7,padx=5,pady=10,sticky=W)
+        self.email_entry=Entry(root,textvariable=self.email_var)
+        self.email_entry.grid(row=0,column=10,pady=10,sticky=W)
+        self.email_err_var=StringVar(root,value='')
+        self.email_error_label=ttk.Label(root,textvariable=self.email_err_var,foreground='red')
+        self.email_error_label.grid(row=0,column=11,sticky=W)
         #email#
 
         #street#
         street_label=Label(root,text='Street:')
-        street_label.grid(row=0,column=8,padx=5,pady=10,sticky=W)
+        street_label.grid(row=0,column=12,pady=10,sticky=W)
         self.street_var=StringVar(root,value='')
-        street_entry=Entry(root,textvariable=self.street_var)
-        street_entry.grid(row=0,column=9,padx=5,pady=10,sticky=W)
+        self.street_entry=Entry(root,textvariable=self.street_var)
+        self.street_entry.grid(row=0,column=13,pady=10,sticky=W)
+        self.street_err_var=StringVar(root,value='')
+        self.street_error_label=ttk.Label(root,textvariable=self.street_err_var,foreground='red')
+        self.street_error_label.grid(row=0,column=14,sticky=W)
         #street#
 
         #------ROW2-----#
         #city#
         city_label=Label(root,text='City:')
-        city_label.grid(row=1,column=0,padx=5,pady=10,sticky=W)
+        city_label.grid(row=1,column=0,pady=10,sticky=W)
         self.city_var=StringVar(root,value='')
-        city_entry=Entry(root,textvariable=self.city_var)
-        city_entry.grid(row=1,column=1,padx=5,pady=10,sticky=W)
+        self.city_entry=Entry(root,textvariable=self.city_var)
+        self.city_entry.grid(row=1,column=1,pady=10,sticky=W)
+        self.city_err_var=StringVar(root,value='')
+        self.city_error_label=ttk.Label(root,textvariable=self.city_err_var,foreground='red')
+        self.city_error_label.grid(row=1,column=2,sticky=W)
         #city#
 
         #state#
         state_label=Label(root,text='State:')
-        state_label.grid(row=1,column=2,padx=5,pady=10,sticky=W)
+        state_label.grid(row=1,column=3,pady=10,sticky=W)
         self.state_var=StringVar(root,value='')
-        state_entry=Entry(root,textvariable=self.state_var)
-        state_entry.grid(row=1,column=3,padx=5,pady=10,sticky=W)
+        self.state_entry=Entry(root,textvariable=self.state_var)
+        self.state_entry.grid(row=1,column=4,pady=10,sticky=W)
+        self.state_err_var=StringVar(root,value='')
+        self.state_error_label=ttk.Label(root,textvariable=self.state_err_var,foreground='red')
+        self.state_error_label.grid(row=1,column=5,sticky=W)
         #state#
 
         #zip#
         zip_label=Label(root,text='Zip:')
-        zip_label.grid(row=1,column=4,padx=5,pady=10,sticky=W)
+        zip_label.grid(row=1,column=6,pady=10,sticky=W)
         self.zip_var=StringVar(root,value='')
-        zip_entry=Entry(root,textvariable=self.zip_var)
-        zip_entry.grid(row=1,column=5,padx=5,pady=10,sticky=W)
+        self.zip_entry=Entry(root,textvariable=self.zip_var)
+        self.zip_entry.grid(row=1,column=7,pady=10,sticky=W)
+        self.zip_err_var=StringVar(root,value='')
+        self.zip_error_label=ttk.Label(root,textvariable=self.zip_err_var,foreground='red')
+        self.zip_error_label.grid(row=1,column=8,sticky=W)
         #zip#
 
         #phone#
         phone_label=Label(root,text='Phone:')
-        phone_label.grid(row=1,column=6,padx=5,pady=10,sticky=W)
+        phone_label.grid(row=1,column=9,pady=10,sticky=W)
         self.phone_var=StringVar(root,value='')
-        phone_entry=Entry(root,textvariable=self.phone_var)
-        phone_entry.grid(row=1,column=7,padx=5,pady=10,sticky=W)
+        self.phone_entry=Entry(root,textvariable=self.phone_var)
+        self.phone_entry.grid(row=1,column=10,pady=10,sticky=W)
+        self.phone_err_var=StringVar(root,value='')
+        self.phone_error_label=ttk.Label(root,textvariable=self.phone_err_var,foreground='red')
+        self.phone_error_label.grid(row=1,column=11,sticky=W)
         #phone#
 
         #DOB#
         dob_label=Label(root,text='DOB:')
-        dob_label.grid(row=1,column=8,padx=5,pady=10,sticky=W)
+        dob_label.grid(row=1,column=12,pady=10,sticky=W)
         self.dob_var=StringVar(root,value='')
-        dob_entry=Entry(root,textvariable=self.dob_var)
-        dob_entry.grid(row=1,column=9,padx=5,pady=10,sticky=W)
+        self.dob_entry=Entry(root,textvariable=self.dob_var)
+        self.dob_entry.grid(row=1,column=13,pady=10,sticky=W)
+        self.dob_err_var=StringVar(root,value='')
+        self.dob_error_label=ttk.Label(root,textvariable=self.dob_err_var,foreground='red')
+        self.dob_error_label.grid(row=1,column=14,sticky=W)
         #DOB#
         
         #------ROW3-----#
         #Sex#
         sex_label=Label(root,text='Sex:')
-        sex_label.grid(row=2,column=0,padx=5,pady=10,sticky=W)
+        sex_label.grid(row=2,column=0,pady=10,sticky=W)
         self.sex_var=StringVar(root,value='')
-        sex_entry=Entry(root,textvariable=self.sex_var)
-        sex_entry.grid(row=2,column=1,padx=5,pady=10,sticky=W)
+        self.sex_entry=ttk.Combobox(root,textvariable=self.sex_var)
+        self.sex_entry['values']=('M','F')
+        self.sex_entry.grid(row=2,column=1,pady=10,sticky=W)
+        self.sex_err_var=StringVar(root,value='')
+        self.sex_error_label=ttk.Label(root,textvariable=self.sex_err_var,foreground='red')
+        self.sex_error_label.grid(row=2,column=2,sticky=W)
         #Sex#
 
         #Lunch#
         lunch_label=Label(root,text='Lunch:')
-        lunch_label.grid(row=2,column=2,padx=5,pady=10,sticky=W)
+        lunch_label.grid(row=2,column=3,pady=10,sticky=W)
         self.lunch_var=StringVar(root,value='')
-        lunch_entry=Entry(root,textvariable=self.lunch_var)
-        lunch_entry.grid(row=2,column=3,padx=5,pady=10,sticky=W)
+        self.lunch_entry=Entry(root,textvariable=self.lunch_var)
+        self.lunch_entry.grid(row=2,column=4,pady=10,sticky=W)
+        self.lunch_err_var=StringVar(root,value='')
+        self.lunch_error_label=ttk.Label(root,textvariable=self.lunch_err_var,foreground='red')
+        self.lunch_error_label.grid(row=2,column=5,sticky=W)
         #DOB#
         
         #buttons#
         add_button=Button(root,text='Add Student',command=self.add_student)
-        add_button.grid(row=2,column=4,padx=5,pady=10,sticky='WE')
+        add_button.grid(row=2,column=6,padx=5,pady=10,sticky='WE',columnspan=2)
 
         update_button=Button(root,text='Update Student',command=self.update_student)
-        update_button.grid(row=2,column=5,padx=5,pady=10,sticky='WE')
+        update_button.grid(row=2,column=9,padx=5,pady=10,sticky='WE',columnspan=2)
 
         delete_button=Button(root,text='Delete Student',command=self.delete_student)
-        delete_button.grid(row=2,column=6,padx=5,pady=10,sticky='WE')
+        delete_button.grid(row=2,column=12,padx=5,pady=10,sticky='WE',columnspan=2)
         #buttons#
 
         #treeview#
@@ -219,7 +257,7 @@ class StudentDB:
             self.cursor.close()
 
         except Error as e:
-            print("Error: ",e)
+            msg.showwarning(title='dbError',message=e)
             
 
     def update_tree(self):
@@ -235,8 +273,9 @@ class StudentDB:
         for data in self.student_info:
             self.tree.insert('','end',values=data)
 
-    def apply_checks_on_entries(self,id_check,f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
+    def apply_checks_on_entries(self,id_check,f_name,l_name,email,street,city,state,zip,phone,dob,sex,lunch):
         check_list=[]
+        widget_with_error_lst=[]
         #patterns#
         name_pat='^[A-Z][a-z]+$'
         city_pat='^[A-Z][A-Za-z\s]+$'
@@ -247,6 +286,7 @@ class StudentDB:
         dob_pat='^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
         email_pat='^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
         lunch_pat='^[0-9]{1,3}\.[0-9]{1,3}$'
+        sex_pat='^[MF]$'
         id_pat='^[1-9]+$'
         #patterns#
 
@@ -255,6 +295,7 @@ class StudentDB:
             id_srch=re.search(id_pat,self.sid_var.get())
             if(id_srch is None):
                 check_list.append(0)
+                widget_with_error_lst.append(self.sid_err_var)
             else:
                 check_list.append(1)
         #id
@@ -263,6 +304,8 @@ class StudentDB:
         f_srch=re.search(name_pat,f_name)
         if(f_srch is None):
             check_list.append(0)
+            widget_with_error_lst.append(self.fname_err_var)
+
         else:
             check_list.append(1)
         #f_name
@@ -271,6 +314,7 @@ class StudentDB:
         l_srch=re.search(name_pat,l_name)
         if(l_srch is None):
             check_list.append(0)
+            widget_with_error_lst.append(self.lname_err_var)
         else:
             check_list.append(1)
         #l_name
@@ -279,6 +323,7 @@ class StudentDB:
         city_srch=re.search(city_pat,city)
         if(city_srch is None):
             check_list.append(0)
+            widget_with_error_lst.append(self.city_err_var)
         else:
             check_list.append(1)
         #city
@@ -288,6 +333,7 @@ class StudentDB:
             state_srch=re.search(state_pat,state)
             if state_srch is None:
                 check_list.append(0)
+                widget_with_error_lst.append(self.state_err_var)
             else:
                 check_list.append(1)
         else:
@@ -298,6 +344,7 @@ class StudentDB:
         street_search=re.search(street_pat,street)
         if(street_search is None):
              check_list.append(0)
+             widget_with_error_lst.append(self.street_err_var)
         else:
             check_list.append(1)
         #street#
@@ -306,6 +353,7 @@ class StudentDB:
         zip_search=re.search(zip_pat,zip)
         if(zip_search is None):
             check_list.append(0)
+            widget_with_error_lst.append(self.zip_err_var)
         else:
             check_list.append(1)
         #zip#
@@ -314,6 +362,7 @@ class StudentDB:
         ph_search=re.search(phone_pat,phone)
         if(ph_search is None or ph_search.span()[0]!=0):
             check_list.append(0)
+            widget_with_error_lst.append(self.phone_err_var)
         else:
             check_list.append(1)
         #phone#
@@ -322,6 +371,7 @@ class StudentDB:
         dob_search=re.search(dob_pat,dob)
         if(dob_search is None):
             check_list.append(0)
+            widget_with_error_lst.append(self.dob_err_var)
         else:
             birth_yr=int(dob[0:4])
             birth_mt=int(dob[5:7])
@@ -330,12 +380,23 @@ class StudentDB:
                 check_list.append(1)
             else:
                 check_list.append(0)
+                widget_with_error_lst.append(self.dob_err_var)
         #dob#
+
+        #sex#
+        sex_search=re.search(sex_pat,sex)
+        if(sex_search is None):
+            check_list.append(0)
+            widget_with_error_lst.append(self.sex_err_var)
+        else:
+            check_list.append(1)
+        #sex#
 
         #email#
         email_search=re.search(email_pat,email)
         if(email_search is None):
             check_list.append(0)
+            widget_with_error_lst.append(self.email_err_var)
         else:
             check_list.append(1)
         #email#
@@ -344,11 +405,17 @@ class StudentDB:
         lunch_search=re.search(lunch_pat,lunch)
         if(lunch_search is None):
             check_list.append(0)
+            widget_with_error_lst.append(self.lunch_err_var)
         else:
             check_list.append(1)
         #lunch#
         
-        return all(check_list)
+        return all(check_list),widget_with_error_lst
+
+    def remove_marks(self):
+        if self.error_widget_list:
+            for w in self.error_widget_list:
+                w.set('')
 
 
     def all_entries_filled(self,id_need):
@@ -386,10 +453,12 @@ class StudentDB:
             zip=self.zip_var.get()
             phone=self.phone_var.get()
             dob=self.dob_var.get()   
-            sex=self.sex_var.get()   #try to apply a combobox here
+            sex=self.sex_var.get() 
             lunch=self.lunch_var.get()
 
-            if self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
+            check_result_tup=self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,sex,lunch)
+
+            if check_result_tup[0]:
 
                 self.query=f'''INSERT INTO students(first_name,last_name,email,street,city,state,zip,phone,birth_date,sex,date_entered,lunch_cost) 
                         VALUES('{f_name}','{l_name}','{email}','{street}','{city}','{state}',{zip},'{phone}',
@@ -398,8 +467,17 @@ class StudentDB:
                 if(self.conn.is_connected()):
                     self.execute_query(self.query,False)
                     self.update_tree()
+                    self.remove_marks()
             else:
-                msg.showwarning(title='Enter Valid Data', message='Please enter valid information! Click on the button on right of entries for more info on format of entries ')
+
+                self.error_widget_list=check_result_tup[1]
+                for w in self.error_widget_list:
+                    w.set('!')
+
+                msg.showwarning(title='Enter Valid Data', message='Please enter valid information! Observe the already entered data in the tree for correct entries! ')
+        
+        else:
+            self.pop_message("Ensure all fields have entries!")
 
     def update_student(self):
         if self.all_entries_filled(True):
@@ -414,8 +492,10 @@ class StudentDB:
             dob=self.dob_var.get()   
             sex=self.sex_var.get()
             lunch=self.lunch_var.get()
-            stu_id=self.sid_var.get()           
-            if self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,lunch):
+            stu_id=self.sid_var.get()
+
+            check_result_tup=self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,sex,lunch)           
+            if check_result_tup[0]:
                 self.query=f'''UPDATE students SET first_name='{f_name}',last_name='{l_name}',email='{email}',
                             street='{street}',city='{city}',state='{state}',zip={zip},phone='{phone}',
                             birth_date='{dob}',sex='{sex}',lunch_cost={lunch} WHERE student_id={stu_id}'''
@@ -423,26 +503,44 @@ class StudentDB:
                 if(self.conn.is_connected()):
                     self.execute_query(self.query,False)
                     self.update_tree()
+                    self.remove_marks()
             else:
-                msg.showwarning(title='Enter Valid Data', message='Please enter valid information! Click on the button on right of entries for more info on format of entries ')
+                self.error_widget_list=check_result_tup[1]
+                for w in self.error_widget_list:
+                    w.set('!')
+
+                msg.showwarning(title='Enter Valid Data', message='Please enter valid information! Observe the already entered data in the tree for correct entries! ')
+        
+        else:
+            self.pop_message("Ensure all fields have entries!")
             
 
     def delete_student(self):
         if len(self.sid_var.get())==0:
-            self.pop_message()
+            self.pop_message("Please enter a ID")
         else:
             stu_id=self.sid_var.get()
-            self.query=f'''DELETE FROM students WHERE student_id={stu_id}'''
-            if(self.conn.is_connected()):
-                self.execute_query(self.query,False)
-                self.update_tree()
+            id_pat='^[1-9]+$'
+            id_srch=re.search(id_pat,stu_id)
+            if(id_srch is None):
+                self.sid_err_var.set('!')
+                self.pop_message("Please enter a valid ID")
+            else:
+                self.query=f'''DELETE FROM students WHERE student_id={stu_id}'''
+                if(self.conn.is_connected()):
+                    self.execute_query(self.query,False)
+                    self.update_tree()
+                    self.sid_err_var.set('')
     
-    def pop_message(self):
-        pass
-
-        
-        
-
+    def pop_message(self,msg):
+        popup_win=Toplevel()
+        popup_win.title("Enter valid values")
+        popup_win.resizable(height=False,width=False)
+        popup_win.geometry("200x50")
+        error_label=Label(popup_win,text=msg)
+        error_label.pack()
+        close_button=Button(popup_win,text='OK',command=popup_win.destroy)
+        close_button.pack()
 
 root=Tk()
 stu_db=StudentDB()
