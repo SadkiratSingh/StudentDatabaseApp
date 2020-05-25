@@ -230,18 +230,26 @@ class StudentDB:
 
         delete_button=Button(root,text='Delete Student',command=self.delete_student)
         delete_button.grid(row=2,column=12,padx=5,pady=10,sticky='WE',columnspan=2)
+
+        refresh_button=Button(root,text='Clear Entries',command=self.refresh_entries)
+        refresh_button.grid(row=2,column=14,padx=5,pady=10,sticky='WE')
         #buttons#
+
+        reset_tree_btn=Button(root,text='Reset Tree',command=self.update_tree)
+        reset_tree_btn.grid(row=4,column=0,padx=5,pady=10,columnspan=14)
 
         #treeview#
         self.tree=ttk.Treeview(root,selectmode='browse',height=14,show='headings')
         self.tree['columns']=self.headers
         self.tree['show']='headings'
+        self.tree.bind('<<TreeviewSelect>>',self.track_item)
         i=1
         for col in self.headers:
             col_id=f'#{i}'
             self.tree.column(col_id,width=113,anchor=CENTER)
             self.tree.heading(col_id,text=col,anchor=CENTER)
             i+=1
+        self.tree.heading('First Name',command=self.sort_by_name)
         self.update_tree()
         self.tree.grid(row=3,column=0,columnspan=20)
         #treeview#
@@ -259,6 +267,51 @@ class StudentDB:
         except Error as e:
             msg.showwarning(title='dbError',message=e)
             
+    
+    def track_item(self,event=None):
+        sel_item=self.tree.selection()[0]
+        sel_item_info=self.tree.item(sel_item)
+        sel_item_data=sel_item_info['values']
+        self.sid_var.set(sel_item_data[0])
+        self.f_name_var.set(sel_item_data[1])
+        self.l_name_var.set(sel_item_data[2])
+        self.email_var.set(sel_item_data[3])
+        self.street_var.set(sel_item_data[4])
+        self.city_var.set(sel_item_data[5])
+        self.state_var.set(sel_item_data[6])
+        self.zip_var.set(sel_item_data[7])
+        self.phone_var.set(sel_item_data[8])
+        self.dob_var.set(sel_item_data[9])
+        self.sex_var.set(sel_item_data[10])
+        self.lunch_var.set(sel_item_data[11])
+
+    def refresh_entries(self):
+        self.sid_var.set('')
+        self.f_name_var.set('')
+        self.l_name_var.set('')
+        self.email_var.set('')
+        self.street_var.set('')
+        self.city_var.set('')
+        self.state_var.set('')
+        self.zip_var.set('')
+        self.phone_var.set('')
+        self.dob_var.set('')
+        self.sex_var.set('')
+        self.lunch_var.set('')
+
+    def sort_by_name(self):
+        self.query='''SELECT student_id,first_name,last_name,email,street,city,state,zip,phone,
+                      birth_date,sex,lunch_cost
+                      FROM students ORDER BY first_name'''
+        if (self.conn.is_connected()):
+            all_students=self.tree.get_children()
+            if(len(all_students)!=0):
+                self.tree.delete(*all_students)
+            self.execute_query(self.query,True)
+
+        for data in self.student_info:
+            self.tree.insert('','end',values=data)
+
 
     def update_tree(self):
         self.query='''SELECT student_id,first_name,last_name,email,street,city,state,zip,phone,
@@ -281,7 +334,7 @@ class StudentDB:
         city_pat='^[A-Z][A-Za-z\s]+$'
         state_pat='^[A-Z]{2}$'
         street_pat='^[A-Z0-9]{1,5}[\w\s]+$'
-        zip_pat='^[0-9]{5}$'
+        zip_pat='^[0-9]{5,12}$'
         phone_pat='^[0-9]{3}-[0-9]{3}-[0-9]{4}$'
         dob_pat='^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
         email_pat='^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
