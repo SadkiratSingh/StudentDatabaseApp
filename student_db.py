@@ -13,12 +13,12 @@ class StudentDB:
     conn=None
     cursor=None
     query=None
-    error_widget_list=None
+    error_widget_list=[]
 
     def __init__(self):
         self.tree=None
-        self.username=StringVar(root,value='')
-        self.pass_word=StringVar(root,value='')
+        self.__username=StringVar(root,value='')
+        self.__pass_word=StringVar(root,value='')
         self.create_login_db()
 
     def create_login_db(self):
@@ -32,14 +32,14 @@ class StudentDB:
         #username#
         user_label=Label(self.frame,text='Username:')
         user_label.grid(row=0,column=0,sticky='E',padx=5,pady=10)
-        user_entry=Entry(self.frame,textvariable=self.username)
+        user_entry=Entry(self.frame,textvariable=self.__username)
         user_entry.grid(row=0,column=1,sticky='W',padx=5,pady=10)
         #username#
     
         #password#
         pass_label=Label(self.frame,text='Password:')
         pass_label.grid(row=1,column=0,sticky='E',padx=5,pady=10)
-        pass_entry=Entry(self.frame,textvariable=self.pass_word,show='*')
+        pass_entry=Entry(self.frame,textvariable=self.__pass_word,show='*')
         pass_entry.grid(row=1,column=1,sticky='W',padx=5,pady=10)
         #password#
 
@@ -53,13 +53,21 @@ class StudentDB:
         error_label=Label(self.frame,textvariable=self.error_var)
         error_label.grid(row=3,column=0,columnspan=2)
         #error_label#
+    
+    @property
+    def username(self):
+        return self.__username.get()
+
+    @property
+    def password(self):
+        return self.__pass_word.get()
 
     def login_and_connect(self):
         #verify#
-        if(len(self.username.get())==0 or
-           self.username.get()!='studentadmin' or
-           len(self.pass_word.get())==0 or
-           self.pass_word.get()!='khalsapanth1*'):
+        if(len(self.username)==0 or
+           self.username!='studentadmin' or
+           len(self.password)==0 or
+           self.password!='khalsapanth1*'):
            self.error_var.set('Enter correct credentials!')
         #verify
 
@@ -71,8 +79,8 @@ class StudentDB:
             ##connect to db##
             try:
                 self.conn=mysql.connector.connect(host='localhost',database='students',
-                                                  username=self.username.get(),
-                                                  password=self.pass_word.get())
+                                                  username=self.username,
+                                                  password=self.password)
             except Error as e:
                 print(e)
             ##connect to db##
@@ -286,6 +294,7 @@ class StudentDB:
         self.lunch_var.set(sel_item_data[11])
 
     def refresh_entries(self):
+        self.remove_marks()
         self.sid_var.set('')
         self.f_name_var.set('')
         self.l_name_var.set('')
@@ -391,6 +400,7 @@ class StudentDB:
                 check_list.append(1)
         else:
             check_list.append(0)
+            widget_with_error_lst.append(self.state_err_var)
         #state#
         
         #street#
@@ -466,9 +476,10 @@ class StudentDB:
         return all(check_list),widget_with_error_lst
 
     def remove_marks(self):
-        if self.error_widget_list:
+        if len(self.error_widget_list)!=0:
             for w in self.error_widget_list:
                 w.set('')
+            self.error_widget_list.clear()
 
 
     def all_entries_filled(self,id_need):
@@ -495,6 +506,7 @@ class StudentDB:
     def add_student(self):
         entry_date=datetime.now()
         entry_date_format=entry_date.strftime('%Y-%m-%d')
+        self.remove_marks()
 
         if self.all_entries_filled(False):
             f_name=self.f_name_var.get()
@@ -520,7 +532,6 @@ class StudentDB:
                 if(self.conn.is_connected()):
                     self.execute_query(self.query,False)
                     self.update_tree()
-                    self.remove_marks()
             else:
 
                 self.error_widget_list=check_result_tup[1]
@@ -533,6 +544,8 @@ class StudentDB:
             self.pop_message("Ensure all fields have entries!")
 
     def update_student(self):
+        self.remove_marks()
+
         if self.all_entries_filled(True):
             f_name=self.f_name_var.get()
             l_name=self.l_name_var.get()
@@ -547,7 +560,8 @@ class StudentDB:
             lunch=self.lunch_var.get()
             stu_id=self.sid_var.get()
 
-            check_result_tup=self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,sex,lunch)           
+            check_result_tup=self.apply_checks_on_entries(False,f_name,l_name,email,street,city,state,zip,phone,dob,sex,lunch)
+
             if check_result_tup[0]:
                 self.query=f'''UPDATE students SET first_name='{f_name}',last_name='{l_name}',email='{email}',
                             street='{street}',city='{city}',state='{state}',zip={zip},phone='{phone}',
@@ -556,7 +570,6 @@ class StudentDB:
                 if(self.conn.is_connected()):
                     self.execute_query(self.query,False)
                     self.update_tree()
-                    self.remove_marks()
             else:
                 self.error_widget_list=check_result_tup[1]
                 for w in self.error_widget_list:
